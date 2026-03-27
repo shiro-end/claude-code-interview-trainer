@@ -18,6 +18,7 @@ function SessionContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingText, setStreamingText] = useState('');
   const [isEnding, setIsEnding] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -69,6 +70,7 @@ function SessionContent() {
           position: session.preset.position,
           level: session.preset.level,
           personality: session.preset.personality,
+          background: session.preset.background,
         }),
       });
 
@@ -124,7 +126,7 @@ function SessionContent() {
 
   if (!session) return null;
 
-  const { position, level, personality } = session.preset;
+  const { position, level, personality, background } = session.preset;
   const positionLabel = getPositionLabel(position);
   const levelLabel = getLevelOption(level)?.label ?? level;
   const personalityLabel = getPersonalityOption(personality)?.label ?? personality;
@@ -132,7 +134,7 @@ function SessionContent() {
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 48px)' }}>
       {/* Session info bar */}
-      <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 mb-4 flex items-center justify-between shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 mb-2 flex items-center justify-between shadow-sm flex-shrink-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
             {positionLabel}
@@ -157,6 +159,24 @@ function SessionContent() {
           {isEnding ? '終了中...' : '面接終了'}
         </button>
       </div>
+
+      {/* Candidate profile panel */}
+      {background && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl mb-2 flex-shrink-0 overflow-hidden">
+          <button
+            onClick={() => setProfileOpen((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-2 text-left"
+          >
+            <span className="text-xs font-semibold text-amber-800">候補者プロフィール</span>
+            <span className="text-amber-600 text-xs">{profileOpen ? '▲ 閉じる' : '▼ 開く'}</span>
+          </button>
+          {profileOpen && (
+            <div className="px-4 pb-3 max-h-24 overflow-y-auto">
+              <p className="text-xs text-amber-900 leading-relaxed whitespace-pre-wrap">{background}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Chat area */}
       <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
@@ -189,7 +209,7 @@ function SessionContent() {
       </div>
 
       {/* Input area */}
-      <div className="mt-4 flex gap-2 items-end">
+      <div className="mt-3 flex gap-2 items-end flex-shrink-0">
         <textarea
           ref={textareaRef}
           value={input}

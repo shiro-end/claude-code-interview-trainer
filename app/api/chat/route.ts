@@ -13,7 +13,6 @@ async function mockStreamResponse(): Promise<Response> {
 
   const readable = new ReadableStream({
     async start(controller) {
-      // Stream character by character with small delays to simulate real streaming
       for (let i = 0; i < text.length; i++) {
         controller.enqueue(encoder.encode(text[i]));
         await new Promise((r) => setTimeout(r, 20));
@@ -39,11 +38,13 @@ export async function POST(req: NextRequest) {
       position,
       level,
       personality,
+      background,
     }: {
       messages: { role: 'user' | 'assistant'; content: string }[];
       position: Position;
       level: Level;
       personality: Personality;
+      background: string;
     } = body;
 
     if (!messages || !position || !level || !personality) {
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
     const { buildCandidateSystemPrompt } = await import('@/lib/presets');
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const systemPrompt = buildCandidateSystemPrompt(position, level, personality);
+    const systemPrompt = buildCandidateSystemPrompt(position, level, personality, background ?? '');
 
     const stream = await anthropic.messages.stream({
       model: 'claude-sonnet-4-5',

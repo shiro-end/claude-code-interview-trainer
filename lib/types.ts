@@ -6,6 +6,7 @@ export type Preset = {
   position: Position;
   level: Level;
   personality: Personality;
+  background: string;
 };
 
 export type Message = {
