@@ -3,6 +3,7 @@ import { Position, Level, Personality } from './types';
 export type PositionOption = {
   value: Position;
   label: string;
+  defaultBackground: string;
 };
 
 export type LevelOption = {
@@ -18,9 +19,24 @@ export type PersonalityOption = {
 };
 
 export const positions: PositionOption[] = [
-  { value: 'sales', label: '営業職' },
-  { value: 'frontend', label: 'フロントエンドエンジニア' },
-  { value: 'hr', label: '人事' },
+  {
+    value: 'sales',
+    label: '営業職',
+    defaultBackground:
+      'SaaS系スタートアップで3年間インサイドセールスを担当。主にIT・HR領域のプロダクトを中小企業向けに提案してきた。月次目標120%達成を継続し、昨年はチームトップの成績。現在は新規開拓に加えカスタマーサクセスも兼務している。',
+  },
+  {
+    value: 'frontend',
+    label: 'フロントエンドエンジニア',
+    defaultBackground:
+      'Web制作会社で4年間フロントエンド開発に従事。React / TypeScriptを用いたSPAの設計・実装が主な業務。最近はNext.jsやTailwind CSSも活用し、BtoB向けダッシュボード系プロダクトを担当。チームリードとして3名のメンバーをマネジメントした経験もある。',
+  },
+  {
+    value: 'hr',
+    label: '人事',
+    defaultBackground:
+      '中堅メーカーの人事部で5年間勤務。採用・研修・労務の幅広い業務を経験。直近2年は新卒採用のリーダーとして年間30名規模の採用を担当。HRテックツールの導入プロジェクトにも携わり、業務効率化に貢献した。',
+  },
 ];
 
 export const levels: LevelOption[] = [
@@ -62,8 +78,12 @@ export const personalities: PersonalityOption[] = [
   },
 ];
 
+export function getPositionOption(value: Position): PositionOption | undefined {
+  return positions.find((p) => p.value === value);
+}
+
 export function getPositionLabel(value: Position): string {
-  return positions.find((p) => p.value === value)?.label ?? value;
+  return getPositionOption(value)?.label ?? value;
 }
 
 export function getLevelOption(value: Level): LevelOption | undefined {
@@ -77,7 +97,8 @@ export function getPersonalityOption(value: Personality): PersonalityOption | un
 export function buildCandidateSystemPrompt(
   position: Position,
   level: Level,
-  personality: Personality
+  personality: Personality,
+  background: string
 ): string {
   const positionLabel = getPositionLabel(position);
   const levelOption = getLevelOption(level);
@@ -86,6 +107,7 @@ export function buildCandidateSystemPrompt(
   return `あなたは就職面接を受けている候補者です。以下のペルソナで一貫してロールプレイしてください。
 
 【ポジション】${positionLabel}の候補者
+【経歴・背景】${background}
 【レベル】${levelOption?.label ?? level}
 【特性】${levelOption?.description ?? ''}
 【性格】${personalityOption?.label ?? personality}
@@ -93,6 +115,7 @@ export function buildCandidateSystemPrompt(
 
 ルール：
 - 面接官の質問に対して、上記ペルソナに沿って自然に回答する
+- 経歴・背景の情報を会話の中で自然に活用する
 - 面接官としての評価コメントや分析は一切しない
 - 回答は必ず日本語で行う
 - 1回の返答は3〜6文程度を目安にする
