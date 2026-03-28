@@ -25,23 +25,29 @@ export type SessionData = {
 
 export type ScoreKey = 'questionQuality' | 'fairness' | 'followUp' | 'openEndedness';
 
-export type GoodQuestion = {
+export type QuestionScore = 'positive' | 'neutral' | 'negative';
+export type NegativeType = 'ng' | 'leading' | 'closed';
+
+export type QuestionEvaluation = {
   question: string;
-  reason: string;
+  score: QuestionScore;
+  reason?: string;        // positive / negative のみ
+  type?: NegativeType;    // negative のみ
+  suggestion?: string;    // negative のみ
 };
 
-export type BadQuestion = {
-  question: string;
-  type: 'ng' | 'leading' | 'closed';
-  reason: string;
-  suggestion: string;
+export type MissedOpportunity = {
+  trigger: string;    // 候補者の発言・場面
+  suggestion: string; // こう聞けばよかった（具体的・答えやすい形）
+  insight: string;    // それで何が分かったか
 };
 
 export type FeedbackResult = {
   scores: Record<ScoreKey, number>;
   scoreLabels: Record<ScoreKey, string>;
-  goodQuestions: GoodQuestion[];
-  badQuestions: BadQuestion[];
+  questionEvaluations: QuestionEvaluation[];
+  missedOpportunities: MissedOpportunity[];
   overallAdvice: string;
   summary: string;
+  warning?: string; // 質問数が少ない場合などに設定
 };
