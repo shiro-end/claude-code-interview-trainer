@@ -62,14 +62,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No messages provided' }, { status: 400 });
     }
 
-    // Use mock feedback when API key is not configured
-    if (!process.env.ANTHROPIC_API_KEY) {
-      await new Promise((r) => setTimeout(r, 1500)); // simulate latency
+    if (!process.env.OPENAI_API_KEY) {
+      await new Promise((r) => setTimeout(r, 1500));
       return NextResponse.json(MOCK_FEEDBACK);
     }
 
-    const { default: Anthropic } = await import('@anthropic-ai/sdk');
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const { default: OpenAI } = await import('openai');
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const conversationLog = buildConversationLog(messages);
 
@@ -109,22 +108,15 @@ ${conversationLog}
 - "leading": 答えを誘導している質問（例：「大変な仕事もできますよね？」）
 - "closed" : Yes/Noしか答えられないクローズドな質問で、それが不適切な文脈で使われているもの`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
       max_tokens: 2048,
+      response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const rawText =
-      response.content[0].type === 'text' ? response.content[0].text : '';
-
-    const jsonText = rawText
-      .replace(/^```json\s*/i, '')
-      .replace(/^```\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim();
-
-    const feedback: FeedbackResult = JSON.parse(jsonText);
+    const rawText = response.choices[0]?.message?.content ?? '{}';
+    const feedback: FeedbackResult = JSON.parse(rawText);
 
     return NextResponse.json(feedback);
   } catch (error) {

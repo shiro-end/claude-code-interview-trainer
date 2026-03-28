@@ -51,39 +51,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Use mock response when API key is not configured
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.OPENAI_API_KEY) {
       return mockStreamResponse();
     }
 
-    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const { default: OpenAI } = await import('openai');
     const { buildCandidateSystemPrompt } = await import('@/lib/presets');
 
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const systemPrompt = buildCandidateSystemPrompt(position, level, personality, background ?? '');
 
-    const stream = await anthropic.messages.stream({
-      model: 'claude-sonnet-4-5',
+    const stream = await openai.chat.completions.create({
+      model: 'gpt-4o',
       max_tokens: 1024,
-      system: systemPrompt,
-      messages,
+      stream: true,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
     });
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
         for await (const chunk of stream) {
-          if (
-            chunk.type === 'content_block_delta' &&
-            chunk.delta.type === 'text_delta'
-          ) {
-            controller.enqueue(encoder.encode(chunk.delta.text));
-          }
+          const text = chunk.choices[0]?.delta?.content ?? '';
+          if (text) controller.enqueue(encoder.encode(text));
         }
         controller.close();
       },
       cancel() {
-        stream.abort();
+        stream.controller.abort();
       },
     });
 
