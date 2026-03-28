@@ -82,6 +82,7 @@ function SessionContent() {
       streamRef.current = stream;
 
       const audioContext = new AudioContext();
+      await audioContext.resume();
       audioContextRef.current = audioContext;
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
