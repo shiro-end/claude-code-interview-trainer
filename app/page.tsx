@@ -19,7 +19,6 @@ export default function SetupPage() {
 
   function handleSelectPosition(val: Position) {
     setPosition(val);
-    // Pre-fill background only when the field is empty or still has a previous preset value
     const preset = positions.find((p) => p.value === val)?.defaultBackground ?? '';
     const currentPresets = positions.map((p) => p.defaultBackground);
     if (!background || currentPresets.includes(background)) {
@@ -47,7 +46,7 @@ export default function SetupPage() {
       </div>
 
       <div className="space-y-6">
-        {/* Position */}
+        {/* ① Position */}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-base font-semibold text-gray-800 mb-3">
             <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">1</span>
@@ -71,10 +70,28 @@ export default function SetupPage() {
           </div>
         </section>
 
-        {/* Level */}
+        {/* ② Background */}
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-800 mb-1">
+            <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">2</span>
+            候補者の経歴・背景
+          </h2>
+          <p className="text-xs text-gray-500 mb-3 ml-8">
+            ポジション選択でプリセットが入力されます。自由に書き換えてください。
+          </p>
+          <textarea
+            value={background}
+            onChange={(e) => setBackground(e.target.value)}
+            placeholder="例：住宅営業として5年間、年間30棟の契約を獲得。注文住宅の提案を得意とし..."
+            rows={4}
+            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400"
+          />
+        </section>
+
+        {/* ③ Level */}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-base font-semibold text-gray-800 mb-3">
-            <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">2</span>
+            <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">3</span>
             経験レベル
           </h2>
           <div className="space-y-2">
@@ -98,10 +115,10 @@ export default function SetupPage() {
           </div>
         </section>
 
-        {/* Personality */}
+        {/* ④ Personality */}
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-base font-semibold text-gray-800 mb-3">
-            <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">3</span>
+            <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">4</span>
             性格タイプ
           </h2>
           <div className="space-y-2">
@@ -123,24 +140,6 @@ export default function SetupPage() {
               </button>
             ))}
           </div>
-        </section>
-
-        {/* Background */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-base font-semibold text-gray-800 mb-1">
-            <span className="inline-block w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-xs text-center leading-6 mr-2">4</span>
-            候補者の経歴・背景
-          </h2>
-          <p className="text-xs text-gray-500 mb-3 ml-8">
-            ポジション選択でプリセットが入力されます。自由に書き換えてください。
-          </p>
-          <textarea
-            value={background}
-            onChange={(e) => setBackground(e.target.value)}
-            placeholder="例：住宅営業として5年間、年間30棟の契約を獲得。注文住宅の提案を得意とし..."
-            rows={4}
-            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400"
-          />
         </section>
 
         <button
