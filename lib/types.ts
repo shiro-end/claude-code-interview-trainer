@@ -1,8 +1,10 @@
-export type Position = 'sales' | 'frontend' | 'hr';
+export type SessionType = 'mid-career' | 'new-grad';
+export type Position = string; // predefined values or custom free text
 export type Level = 'junior' | 'middle' | 'senior';
 export type Personality = 'assertive' | 'nervous' | 'cautious';
 
 export type Preset = {
+  sessionType: SessionType;
   position: Position;
   level: Level;
   personality: Personality;
@@ -31,15 +33,15 @@ export type NegativeType = 'ng' | 'leading' | 'closed';
 export type QuestionEvaluation = {
   question: string;
   score: QuestionScore;
-  reason?: string;        // positive / negative のみ
-  type?: NegativeType;    // negative のみ
-  suggestion?: string;    // negative のみ
+  reason?: string;
+  type?: NegativeType;
+  suggestion?: string;
 };
 
 export type MissedOpportunity = {
-  trigger: string;    // 候補者の発言・場面
-  suggestion: string; // こう聞けばよかった（具体的・答えやすい形）
-  insight: string;    // それで何が分かったか
+  trigger: string;
+  suggestion: string;
+  insight: string;
 };
 
 export type FeedbackResult = {
@@ -49,5 +51,5 @@ export type FeedbackResult = {
   missedOpportunities: MissedOpportunity[];
   overallAdvice: string;
   summary: string;
-  warning?: string; // 質問数が少ない場合などに設定
+  warning?: string;
 };
