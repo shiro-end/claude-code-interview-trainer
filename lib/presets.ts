@@ -1,7 +1,7 @@
-import { Position, Level, Personality } from './types';
+import { Level, Personality, SessionType } from './types';
 
 export type PositionOption = {
-  value: Position;
+  value: string;
   label: string;
   defaultBackground: string;
 };
@@ -18,7 +18,7 @@ export type PersonalityOption = {
   description: string;
 };
 
-export const positions: PositionOption[] = [
+export const midCareerPositions: PositionOption[] = [
   {
     value: 'sales',
     label: '営業職',
@@ -38,6 +38,30 @@ export const positions: PositionOption[] = [
       '中堅メーカーの人事部で5年間勤務。採用・研修・労務の幅広い業務を経験。直近2年は新卒採用のリーダーとして年間30名規模の採用を担当。HRテックツールの導入プロジェクトにも携わり、業務効率化に貢献した。',
   },
 ];
+
+export const newGradPositions: PositionOption[] = [
+  {
+    value: 'new-grad-general',
+    label: '総合職',
+    defaultBackground:
+      '○○大学経済学部4年。学生時代はゼミ長として20名のメンバーをまとめ、企業との共同研究プロジェクトをリード。インターンシップでは人事部門にて採用サポート業務を3ヶ月経験した。',
+  },
+  {
+    value: 'new-grad-engineer',
+    label: '技術職',
+    defaultBackground:
+      '○○大学工学部情報工学科4年。研究室では機械学習を用いた画像認識の研究に従事。個人でWebアプリを開発しGitHubで公開しており、ハッカソンにも複数回参加している。',
+  },
+  {
+    value: 'new-grad-sales',
+    label: '営業職',
+    defaultBackground:
+      '○○大学商学部4年。居酒屋のアルバイトリーダーとして売上改善施策を立案・実行し、月次売上を15%向上。ゼミではマーケティングを専攻し、フィールドワークにも積極的に参加してきた。',
+  },
+];
+
+// Keep backward-compatible export (mid-career is the default)
+export const positions = midCareerPositions;
 
 export const levels: LevelOption[] = [
   {
@@ -78,12 +102,9 @@ export const personalities: PersonalityOption[] = [
   },
 ];
 
-export function getPositionOption(value: Position): PositionOption | undefined {
-  return positions.find((p) => p.value === value);
-}
-
-export function getPositionLabel(value: Position): string {
-  return getPositionOption(value)?.label ?? value;
+export function getPositionLabel(value: string): string {
+  const all = [...midCareerPositions, ...newGradPositions];
+  return all.find((p) => p.value === value)?.label ?? value;
 }
 
 export function getLevelOption(value: Level): LevelOption | undefined {
@@ -95,14 +116,35 @@ export function getPersonalityOption(value: Personality): PersonalityOption | un
 }
 
 export function buildCandidateSystemPrompt(
-  position: Position,
+  position: string,
   level: Level,
   personality: Personality,
-  background: string
+  background: string,
+  sessionType: SessionType = 'mid-career'
 ): string {
-  const positionLabel = getPositionLabel(position);
   const levelOption = getLevelOption(level);
   const personalityOption = getPersonalityOption(personality);
+  const positionLabel = getPositionLabel(position);
+
+  if (sessionType === 'new-grad') {
+    return `あなたは就職活動中の学生（新卒応募者）です。以下のペルソナで一貫してロールプレイしてください。
+
+【応募ポジション】${positionLabel}
+【学歴・経験】${background}
+【コミュニケーションレベル】${levelOption?.label ?? level}
+【特性】${levelOption?.description ?? ''}
+【性格】${personalityOption?.label ?? personality}
+【性格の特性】${personalityOption?.description ?? ''}
+
+ルール：
+- 面接官の質問に対して、上記ペルソナに沿って自然に回答する
+- 学生・新卒としての経験（ゼミ・サークル・アルバイト・インターン等）を中心に話す
+- 社会人としての業務経験があるような発言はしない
+- 面接官としての評価コメントや分析は一切しない
+- 回答は必ず日本語で行う
+- 1回の返答は3〜6文程度を目安にする
+- ペルソナから外れた行動（急に流暢になるなど）はしない`;
+  }
 
   return `あなたは就職面接を受けている候補者です。以下のペルソナで一貫してロールプレイしてください。
 

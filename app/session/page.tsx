@@ -71,6 +71,7 @@ function SessionContent() {
           level: session.preset.level,
           personality: session.preset.personality,
           background: session.preset.background,
+          sessionType: session.preset.sessionType ?? 'mid-career',
         }),
       });
 

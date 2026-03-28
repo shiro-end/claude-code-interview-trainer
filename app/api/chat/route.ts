@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Position, Level, Personality } from '@/lib/types';
+import { Level, Personality, SessionType } from '@/lib/types';
 
 const MOCK_RESPONSES = [
   'はい、ご質問ありがとうございます。えっと、少し考えさせてください。前職では主にチームのサポート業務を担当していて、具体的な数字としてはお伝えしにくいんですが、日々の業務をしっかりこなしてきたと思っています。まだ経験が浅い部分もありますが、一生懸命取り組んでいます。',
@@ -39,12 +39,14 @@ export async function POST(req: NextRequest) {
       level,
       personality,
       background,
+      sessionType,
     }: {
       messages: { role: 'user' | 'assistant'; content: string }[];
-      position: Position;
+      position: string;
       level: Level;
       personality: Personality;
       background: string;
+      sessionType?: SessionType;
     } = body;
 
     if (!messages || !position || !level || !personality) {
@@ -59,7 +61,7 @@ export async function POST(req: NextRequest) {
     const { buildCandidateSystemPrompt } = await import('@/lib/presets');
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const systemPrompt = buildCandidateSystemPrompt(position, level, personality, background ?? '');
+    const systemPrompt = buildCandidateSystemPrompt(position, level, personality, background ?? '', sessionType ?? 'mid-career');
 
     const stream = await openai.chat.completions.create({
       model: 'gpt-4o',
