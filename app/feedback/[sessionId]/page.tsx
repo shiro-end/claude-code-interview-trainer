@@ -6,7 +6,11 @@ import { getSession, saveSession } from '@/lib/storage';
 import { SessionData, FeedbackResult } from '@/lib/types';
 import { getPositionLabel, getLevelOption, getPersonalityOption } from '@/lib/presets';
 import ScoreCard from '@/components/ScoreCard';
-import { GoodQuestionList, BadQuestionList } from '@/components/QuestionList';
+import {
+  QuestionEvaluationList,
+  MissedOpportunityList,
+  GoodQuestionSummary,
+} from '@/components/QuestionList';
 import ChatBubble from '@/components/ChatBubble';
 
 type Status = 'loading' | 'fetching' | 'done' | 'error';
@@ -129,9 +133,16 @@ export default function FeedbackPage() {
         </div>
       ) : (
         <>
-          {/* Feedback sections */}
           {feedback && (
             <>
+              {/* Warning banner */}
+              {feedback.warning && (
+                <div className="bg-yellow-50 border border-yellow-300 rounded-xl px-5 py-3 flex items-start gap-2">
+                  <span className="text-yellow-500 text-base flex-shrink-0">⚠️</span>
+                  <p className="text-sm text-yellow-800">{feedback.warning}</p>
+                </div>
+              )}
+
               {/* Summary */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
                 <h3 className="font-semibold text-blue-800 mb-2">総評</h3>
@@ -141,11 +152,14 @@ export default function FeedbackPage() {
               {/* Score */}
               <ScoreCard scores={feedback.scores} scoreLabels={feedback.scoreLabels} />
 
-              {/* Good questions */}
-              <GoodQuestionList questions={feedback.goodQuestions} />
+              {/* Per-question evaluations */}
+              <QuestionEvaluationList evaluations={feedback.questionEvaluations ?? []} />
 
-              {/* Bad questions */}
-              <BadQuestionList questions={feedback.badQuestions} />
+              {/* Missed opportunities */}
+              <MissedOpportunityList items={feedback.missedOpportunities ?? []} />
+
+              {/* Good question summary (filtered from positives) */}
+              <GoodQuestionSummary evaluations={feedback.questionEvaluations ?? []} />
 
               {/* Overall advice */}
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
