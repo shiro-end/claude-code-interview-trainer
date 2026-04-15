@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = buildCandidateSystemPrompt(position, level, personality, background ?? '', sessionType ?? 'mid-career');
 
     const stream = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       max_tokens: 1024,
       stream: true,
       messages: [
